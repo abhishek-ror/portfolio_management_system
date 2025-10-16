@@ -1,5 +1,5 @@
 class EmailTemplatesController < ApplicationController
-  before_action :set_email_template, only: [:show, :edit, :update, :destroy, :preview, :send_email]
+  before_action :set_email_template, only: [ :show, :edit, :update, :destroy, :preview, :send_email ]
 
   def index
     @email_templates = EmailTemplate.all
@@ -15,9 +15,9 @@ class EmailTemplatesController < ApplicationController
 
   def create
     @email_template = EmailTemplate.new(email_template_params)
-    
+
     if @email_template.save
-      redirect_to email_templates_path, notice: 'Email template was successfully created.'
+      redirect_to email_templates_path, notice: "Email template was successfully created."
     else
       render :new, status: :unprocessable_entity
     end
@@ -28,7 +28,7 @@ class EmailTemplatesController < ApplicationController
 
   def update
     if @email_template.update(email_template_params)
-      redirect_to email_templates_path, notice: 'Email template was successfully updated.'
+      redirect_to email_templates_path, notice: "Email template was successfully updated."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -36,13 +36,13 @@ class EmailTemplatesController < ApplicationController
 
   def destroy
     @email_template.destroy
-    redirect_to email_templates_path, notice: 'Email template was successfully deleted.'
+    redirect_to email_templates_path, notice: "Email template was successfully deleted."
   end
 
   def preview
     @contact = Contact.find(params[:contact_id])
     @rendered = @email_template.render_for_contact(@contact)
-    
+
     respond_to do |format|
       format.html
       format.json { render json: @rendered }
@@ -52,7 +52,7 @@ class EmailTemplatesController < ApplicationController
   def send_email
     @contact = Contact.find(params[:contact_id])
     @rendered = @email_template.render_for_contact(@contact)
-    
+
     redirect_to contacts_path, notice: "Email '#{@rendered[:subject]}' sent to #{@contact.name} (#{@contact.email})"
   end
 

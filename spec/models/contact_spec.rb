@@ -9,7 +9,7 @@ RSpec.describe Contact, type: :model do
   describe 'validations' do
     it { should validate_presence_of(:name) }
     it { should validate_presence_of(:email) }
-    
+
     it 'validates email format' do
       contact = Contact.new(name: 'Test', email: 'invalid', organization: Organization.create!(name: 'Test Org', email: 'test@example.com'))
       expect(contact).not_to be_valid
@@ -30,7 +30,7 @@ RSpec.describe Contact, type: :model do
         Portfolio.create!(name: 'Fund A', balance: 1000, performance: 15.0, contact: contact)
         Portfolio.create!(name: 'Fund B', balance: 2000, performance: -5.0, contact: contact)
         Portfolio.create!(name: 'Fund C', balance: 1500, performance: 8.5, contact: contact)
-        
+
         expect(contact.best_performance).to eq(15.0)
       end
     end
@@ -44,7 +44,7 @@ RSpec.describe Contact, type: :model do
         Portfolio.create!(name: 'Fund A', balance: 1000, performance: 15.0, contact: contact)
         Portfolio.create!(name: 'Fund B', balance: 2000, performance: -5.0, contact: contact)
         Portfolio.create!(name: 'Fund C', balance: 1500, performance: 8.5, contact: contact)
-        
+
         expect(contact.worst_performance).to eq(-5.0)
       end
     end
