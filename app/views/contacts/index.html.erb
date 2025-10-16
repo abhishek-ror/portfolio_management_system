@@ -1,0 +1,130 @@
+<div class="container">
+  <div class="header">
+    <h1>Contacts Dashboard</h1>
+    <%= link_to "Email Templates", email_templates_path, class: "btn btn-secondary" %>
+  </div>
+
+  <div class="contacts-list">
+    <% @contacts.each do |contact| %>
+      <div class="contact-card">
+        <div class="contact-info">
+          <h2><%= contact.name %> (<%= contact.email %>)</h2>
+          <p class="org-info">Org: <%= contact.organization.name %></p>
+        </div>
+
+        <div class="portfolios">
+          <% contact.portfolios.each do |portfolio| %>
+            <div class="portfolio-item">
+              • <%= portfolio.name %> — Balance: <%= number_to_currency(portfolio.balance) %> 
+              Perf: <%= number_to_percentage(portfolio.performance, precision: 2) %>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="performance-summary">
+          <strong>Best:</strong> <%= number_to_percentage(contact.best_performance, precision: 2) %>
+          <strong>Worst:</strong> <%= number_to_percentage(contact.worst_performance, precision: 2) %>
+        </div>
+
+        <div class="email-actions">
+          <%= form_with url: "#", method: :get, local: true, id: "email-form-#{contact.id}", class: "email-form" do %>
+            <%= select_tag "template_id_#{contact.id}", 
+                options_from_collection_for_select(@email_templates, :id, :subject), 
+                prompt: "Select Template",
+                class: "template-select",
+                data: { contact_id: contact.id } %>
+            
+            <button type="button" class="btn btn-preview" data-contact-id="<%= contact.id %>">
+              Preview
+            </button>
+            
+            <button type="button" class="btn btn-send" data-contact-id="<%= contact.id %>">
+              Send
+            </button>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div id="preview-modal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Email Preview</h2>
+    <div id="preview-subject" class="preview-subject"></div>
+    <div id="preview-body" class="preview-body"></div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const modal = document.getElementById('preview-modal');
+  const closeBtn = document.querySelector('.close');
+
+  closeBtn.onclick = function() {
+    modal.style.display = 'none';
+  }
+
+  window.onclick = function(event) {
+    if (event.target == modal) {
+      modal.style.display = 'none';
+    }
+  }
+
+  document.querySelectorAll('.btn-preview').forEach(button => {
+    button.addEventListener('click', function() {
+      const contactId = this.dataset.contactId;
+      const templateId = document.querySelector(`#template_id_${contactId}`).value;
+      
+      if (!templateId) {
+        alert('Please select a template');
+        return;
+      }
+
+      fetch(`/email_templates/${templateId}/preview?contact_id=${contactId}`)
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('preview-subject').innerHTML = `<strong>Subject:</strong> ${data.subject}`;
+          document.getElementById('preview-body').innerHTML = `<strong>Body:</strong><br>${data.body.replace(/\n/g, '<br>')}`;
+          modal.style.display = 'block';
+        })
+        .catch(error => {
+          alert('Error loading preview');
+          console.error(error);
+        });
+    });
+  });
+
+  document.querySelectorAll('.btn-send').forEach(button => {
+    button.addEventListener('click', function() {
+      const contactId = this.dataset.contactId;
+      const templateId = document.querySelector(`#template_id_${contactId}`).value;
+      
+      if (!templateId) {
+        alert('Please select a template');
+        return;
+      }
+
+      if (confirm('Are you sure you want to send this email?')) {
+        fetch(`/email_templates/${templateId}/send_email?contact_id=${contactId}`, {
+          method: 'POST',
+          headers: {
+            'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content,
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => {
+          if (response.redirected) {
+            window.location.href = response.url;
+          }
+        })
+        .catch(error => {
+          alert('Error sending email');
+          console.error(error);
+        });
+      }
+    });
+  });
+});
+</script>

@@ -1,0 +1,37 @@
+<div class="container">
+  <div class="header">
+    <h1>Email Templates</h1>
+    <div class="header-actions">
+      <%= link_to "Back to Contacts", contacts_path, class: "btn btn-secondary" %>
+      <%= link_to "+ New Template", new_email_template_path, class: "btn btn-primary" %>
+    </div>
+  </div>
+
+  <div class="templates-table">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Subject</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @email_templates.each do |template| %>
+          <tr>
+            <td><%= template.id %></td>
+            <td><%= template.subject %></td>
+            <td class="actions">
+              <%= link_to "View", email_template_path(template), class: "btn btn-sm btn-info" %>
+              <%= link_to "Edit", edit_email_template_path(template), class: "btn btn-sm btn-warning" %>
+              <%= link_to "Delete", email_template_path(template), 
+                  method: :delete, 
+                  data: { confirm: "Are you sure?" }, 
+                  class: "btn btn-sm btn-danger" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

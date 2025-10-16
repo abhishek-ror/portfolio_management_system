@@ -1,0 +1,40 @@
+<%= form_with(model: email_template, local: true, class: "email-template-form") do |form| %>
+  <% if email_template.errors.any? %>
+    <div class="errors">
+      <h3><%= pluralize(email_template.errors.count, "error") %> prohibited this template from being saved:</h3>
+      <ul>
+        <% email_template.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= form.label :subject %>
+    <%= form.text_field :subject, class: "form-control", placeholder: "Portfolio Performance Summary" %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :body %>
+    <%= form.text_area :body, rows: 15, class: "form-control", placeholder: "Hello {Contact.name},\n\nYour organization: {Organization.name}\n\nBest portfolio: {Portfolio.best_performance}%\nWorst portfolio: {Portfolio.worst_performance}%" %>
+  </div>
+
+  <div class="form-hints">
+    <h4>Available Shortcodes:</h4>
+    <ul>
+      <li><code>{Contact.name}</code></li>
+      <li><code>{Contact.email}</code></li>
+      <li><code>{Organization.name}</code></li>
+      <li><code>{Organization.email}</code></li>
+      <li><code>{Portfolio.best_performance}</code></li>
+      <li><code>{Portfolio.worst_performance}</code></li>
+    </ul>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit "Save", class: "btn btn-primary" %>
+    <%= link_to "Cancel", email_templates_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>
+

@@ -1,0 +1,8 @@
+<div class="container">
+  <div class="header">
+    <h1>Edit Email Template</h1>
+    <%= link_to "Back", email_templates_path, class: "btn btn-secondary" %>
+  </div>
+
+  <%= render "form", email_template: @email_template %>
+</div>
