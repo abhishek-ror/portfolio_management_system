@@ -82,15 +82,24 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
 
-      fetch(`/email_templates/${templateId}/preview?contact_id=${contactId}`)
-        .then(response => response.json())
+      fetch(`/email_templates/${templateId}/preview.json?contact_id=${contactId}`, {
+        headers: {
+          'Accept': 'application/json'
+        }
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
         .then(data => {
           document.getElementById('preview-subject').innerHTML = `<strong>Subject:</strong> ${data.subject}`;
           document.getElementById('preview-body').innerHTML = `<strong>Body:</strong><br>${data.body.replace(/\n/g, '<br>')}`;
           modal.style.display = 'block';
         })
         .catch(error => {
-          alert('Error loading preview');
+          alert('Error loading preview: ' + error.message);
           console.error(error);
         });
     });
